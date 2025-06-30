@@ -1,0 +1,38 @@
+---
+title: AI Policy
+---
+
+Generative AI can provide *some value* to cybersecurity analysts. It would be disingenous to suggest that models can't be helpful for things like skeletoning a Sigma rule or identifying a common error in a Python script you wrote.
+
+That said, I believe there are serious ethical problems with the widespread use of AI (including the well known Large Language Models like ChatGPT and Claude). I have ever so slightly less of a concern with Retrieval-Augmented Generation (RAG) models.
+
+This site is governed by the following policy on AI, including community contributions:
+
+1. A page may contain 30% AI-*assisted* content at most.
+    - AI cannot have written the entire narrative.
+2. If an author chooses to utilize AI for any part of the writing process, they must include the banner seen below.
+3. AI-generated images are strictly forbidden. Support human artists.
+4. Any AI-assisted content is checked by a human for accuracy and completeness.
+
+The banner and its usage is seen below:
+
+:::AI[AI]
+
+This content is produced with AI-assistance. No more than 30% of the content originates from AI, and it has been checked by a human for accuracy and completeness. For more information, please see [the AI policy](docs/ai-policy.mdx).
+
+:::
+
+To use this banner, include the following at the **top** of your MDX document (immediately following any front matter).
+
+```markdown
+---
+title: Your Title Here
+<!-- Include any other front matter -->
+---
+
+:::AI[AI]
+
+This content is produced with AI-assistance. No more than 30% of the content originates from AI, and it has been checked by a human for accuracy and completeness. For any concerns, please see [the AI policy](docs/ai-policy.mdx).
+
+:::
+```
