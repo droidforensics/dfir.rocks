@@ -1,0 +1,104 @@
+site_name: DFIR Rocks!
+site_url: https://dfir.rocks
+
+repo_url: https://github.com/droidforensics/dfir.rocks
+edit_uri: edit/main/docs
+
+theme:
+  name: material
+  custom_dir: overrides
+  palette: 
+    scheme: slate
+    primary: blue grey
+    accent: indigo
+  features:
+    - navigation.instant # Make the site into a single page app
+    - navigation.instant.prefetch # When user hovers a link, start loading
+    - navigation.instant.progress # Loading bar, helpful for slower connections
+    - navigation.tabs # Tabs at the top of the webpage
+    - navigation.tabs.sticky # Tabs follow on scroll
+    - navigation.sections # Sections make up the left-hand toolbar
+    - navigation.expand # Collapsing subsections
+    - navigation.path # Breadcrumbs!
+    - navigation.prune # Site optimization
+    - navigation.indexes # Sections can have "index" pages https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#section-index-pages
+    - toc.follow # TOC follows w/ scroll
+    - content.action.edit # Allow users to easily suggest changes
+    - content.action.view # Allow users to see the source easily
+    - content.tooltips # https://squidfunk.github.io/mkdocs-material/reference/tooltips/#improved-tooltips
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - abbr # Abbreviations
+  - attr_list # Several functions: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown/#attribute-lists
+  - pymdownx.snippets:
+      auto_append:
+        - includes/glossary.md # Define terms to be underlined as abbreviations/"a glossary"
+  - admonition
+  - def_list # https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown/#definition-lists
+  - footnotes # https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown/#footnotes
+  - toc:
+      permalink: 
+  - tables
+  - pymdownx.betterem # https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown-extensions/#betterem
+  - pymdownx.blocks.caption # https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown-extensions/#caption
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji 
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: false
+  - pymdownx.tasklist:
+      custom_checkbox: true
+plugins:
+  - search
+  - social
+  - blog:
+      authors_profiles: true
+  - rss:
+      match_path: blog/posts/.*
+      date_from_meta:
+        as_creation: date
+      categories:
+        - categories
+        - tags
+  - meta:
+      enabled: true
+  #- git-revision-date-localized:
+  #    type: date
+  #    fallback_to_build_date: true
+  #    enable_creation_date: true
+  #    enabled: true
+  #- git-authors:
+  #    enabled: true
+
+  # CI=true mkdocs build
+  - group:
+      enabled: !ENV CI
+      plugins:
+        - git-revision-date-localized
+        - git-committers
+
+  # INSIDERS=true mkdocs build
+  - group:
+      enabled: !ENV INSIDERS
+      plugins:
+        - optimize
+        - privacy
+
+watch:
+  - includes
+
+nav:
+  - Home: index.md
+  - Lab:
+    - lab/index.md
+    - lab/01 - Introduction.md
+    - lab/02 - Topology.md
+  - Blog:
+    - blog/index.md
