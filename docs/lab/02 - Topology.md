@@ -23,11 +23,11 @@ The Lab's network is indeed ever changing. The CIO throws money at us for hardwa
 !!! question "What's Proxmox?"
     Proxmox is a virtualization software, like VMware. Proxmox assigns IDs to each virtual machine. The IDs rarely change, and *can* be a good way to track devices even if their IPs change.
 
-The `10.2.20.0/24` subnet is where almost everything lives. You'll see workstations come and go as employees do. I guess we only had one person here when I did the network scan. That was probably me.
+The `10.2.20.0/24` subnet is where almost everything lives. You'll see workstations come and go as employees do.
 
-- `jt-svr22-01` is our domain controller, file server, all that stuff
-- `jt-ub-01` is a Linux server I play with from time to time
-- `jt-elastic` and `jt-splunk` are left over from our third-party SOC but they didn't destroy the VMs when they left so I've kept them
+- Before we went our separate ways, we got the MSSP to set up Elastic. I don't think it's ready for prime time yet. I don't know if anyone's reviewing the alerts. I guess you could.
+- We use `ub-01` as a data analytics server, most people have access, but I know Gregory was using it for something too. Volcano...? Whatever that is.
+- As you asked, I made `10.2.20.55` and named it `velociraptor`. Do with it what you want to.
 
 I made this `10.2.100.0/24` subnet to isolate the guest WiFi but the isolation isn't exactly what I was hoping for. I need to do some more work on it. I also join any new hardware I'm testing, like phones or new Microsoft tablets, to this WiFi before I set them up with our software!
 
@@ -76,11 +76,43 @@ ludus templates build
 - `p4t12ick.ludus_ar_windows` 
 - `p4t12ick.ludus_ar_linux` for Linux clients
 
-I've made some customizations to the Windows role, including changing which Sysmon configuration is deployed.
+The deployment usually looks something like this:
+
+- `ludus range config set -f myconfig.yml`
+- `ludus range deploy` && `ludus range logs -f` to keep an eye on it
+- If/when something goes wrong, `ludus range deploy -t user-defined-roles`
+- `ludus range deploy -t share`
+
+Repeating the `user-defined-roles` line is often required. If one host is giving me particular problems, I can exclude it by using `ludus range deploy -t user-defined-roles --limit <comma separated hosts EXCLUDING the problem host>`.
 
 ### Lab Config
 
-The latest version of my lab configuration is [here](../ludus-range.yml).
+The latest version of my lab configuration is [here](https://gist.github.com/droidforensics/c47ccef0d5366ec02fef923e79d983b9).
+
+Additional tweaks are described below.
+
+### Bad Blood
+
+[Bad Blood](https://github.com/davidprowe/BadBlood) runs. The values are randomized.
+
+### Sysmon Changes
+
+I'm using various editions of [Sysmon Modular](https://github.com/olafhartong/sysmon-modular) instead of SwiftOnSecurity's config that Attack Range ships with.
+
+### Enhanced Logging
+
+Multiple components of Ludus enhance logging (e.g., the Attack Range role modifies Powershell logging), but I've added yet another layer. [This script from Yamato-Security](https://github.com/Yamato-Security/EnableWindowsLogSettings/blob/main/YamatoSecurityConfigureWinEventLogs.bat) acts as my "main" configuration.
+
+Windows systems should have *at least* this configuration, regardless of being domain joined or not. Anything over-and-beyond is great, but this is the baseline.
+
+I made the following changes from the script linked above:
+
+```batch
+:: Sysmon can be just over 16GB
+wevtutil sl Microsoft-Windows-Sysmon/Operational /ms:17179869184
+
+:: No other changes at this time
+```
 
 ### Disabling Defender
 
@@ -98,7 +130,7 @@ I have yet to learn how to be a hacker at all, let alone one that can bypass or 
     - `Path Exclusions`: **Enabled**
       - Add `C:\` as an exception. Value name: `C:\` and value: `0`
 
-### Various Powershell  Tweaks
+### Various Powershell Tweaks
 
 - Computer Configuration -> Policies -> Administrative Templates -> Windows Components -> Windows Powershell
   - `Turn on module logging`: **Enabled**
@@ -119,5 +151,21 @@ Without this, there's a 60s waiting period when you RDP in and someone else is l
   - `Restrict Remote Desktop Services user to a single Remote Desktop Services`: **Disabled**
   - `Limit number of connections`: `999999`
 
-### 7day Share
+### Network Shares
 
+There are (at least) three network shares:
+
+- `readonlyshare` 
+- `readwriteshare`
+- `labratoryshare`
+
+The first two are convenience shares that [Ludus provides](https://docs.ludus.cloud/docs/file-share/). They won't be used for malice, but will be used for convenience/centralization of resources. On the other hand, `labratoryshare` is "in scope" for our adversary.
+
+!!! tip
+    For a "lore-friendly" explanation, we can assume the adversary never found out about the `read` shares, or they had no interest in them.
+
+The `read` shares have, among other things:
+
+- A Velociraptor offline collector doing KAPE triage collections
+- Sysmon binaries + config files
+- Misc. installers
