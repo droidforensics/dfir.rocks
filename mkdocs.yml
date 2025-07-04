@@ -67,6 +67,7 @@ plugins:
       categories:
         - categories
         - tags
+      use_git: false # Maybe causing Cloudflare pages failures? # https://github.com/squidfunk/mkdocs-material/discussions/7328
   - meta:
       enabled: true
   #- git-revision-date-localized:
