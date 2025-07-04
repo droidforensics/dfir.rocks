@@ -77,20 +77,6 @@ plugins:
   #- git-authors:
   #    enabled: true
 
-  # CI=true mkdocs build
-  - group:
-      enabled: !ENV CI
-      plugins:
-        - git-revision-date-localized
-        - git-committers
-
-  # INSIDERS=true mkdocs build
-  - group:
-      enabled: !ENV INSIDERS
-      plugins:
-        - optimize
-        - privacy
-
 watch:
   - includes
 
