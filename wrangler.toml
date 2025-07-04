@@ -1,4 +1,4 @@
-name = "dfir-rocks-cfworker"
+name = 'dfir-rocks-worker'
 compatibility_date = "2025-07-01"
 
 [assets]
